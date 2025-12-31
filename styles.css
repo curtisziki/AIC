@@ -90,11 +90,11 @@ body {
 
 .navbar .container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
-/* Nom du site doux */
+/* Nom du site doux centré et réduit */
 .nav-brand-link {
     text-decoration: none;
     color: inherit;
@@ -103,10 +103,11 @@ body {
 
 .nav-brand h1 {
     color: var(--primary-light);
-    font-size: 2.2rem;
+    font-size: 1.3rem;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 4px;
+    letter-spacing: 2px;
+    margin: 0 auto;
     text-shadow: 
         0 2px 8px var(--primary-color), 
         0 0 2px #edeaf6,
@@ -115,6 +116,7 @@ body {
     background: linear-gradient(90deg, var(--primary-light), var(--primary-color) 60%, #edeaf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-align: center;
 }
 
 .nav-brand-link:hover .nav-brand h1 {
@@ -124,7 +126,6 @@ body {
         0 4px 14px var(--primary-color),
         0 0 2px #edeaf6,
         0 1px 0 #fff;
-    /* sans effet néon flash */
     background: linear-gradient(90deg, var(--primary-color), var(--primary-light), #edeaf6 110%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -423,6 +424,14 @@ body {
     margin-right: 0.5rem;
 }
 
+/* Centrage du champ WhatsApp ou input de contact */
+.contact-input-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
 .contact-input-field {
     width: 100%;
     max-width: 400px;
@@ -432,7 +441,7 @@ body {
     background: var(--background);
     color: var(--text-primary);
     font-size: 1rem;
-    margin-bottom: 1.5rem;
+    /* margin-bottom supprimé et délégué au wrapper pour le centrage */
     box-sizing: border-box;
 }
 
@@ -658,5 +667,8 @@ body {
     }
     .contact-input-field {
         max-width: 90vw;
+    }
+    .contact-input-wrapper {
+        max-width: 100vw;
     }
 }
