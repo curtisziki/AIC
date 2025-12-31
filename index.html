@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambassade Internationale de Christ</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="#hero" class="nav-brand-link">
+                    <h1>AMBASSADE INTERNATIONALE DE CHRIST</h1>
+                </a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section avec image de foule -->
+    <section class="hero" id="hero">
+        <div class="hero-background">
+            <div class="hero-slide slide-1"></div>
+            <div class="hero-slide slide-2"></div>
+            <div class="hero-slide slide-3"></div>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="hero-title">Bienvenue sur le site de l'église AIC !</h2>
+            <p class="hero-subtitle">une église où le Saint-Esprit transforme le monde en Ambassadeur.</p>
+            <button class="cta-button" onclick="scrollToVerses()">Découvrir les Versets</button>
+        </div>
+    </section>
+
+    <!-- Section Versets par Catégorie -->
+    <section class="verses-section" id="verses">
+        <div class="container">
+            <h2 class="section-title">Découvrez votre Verset Biblique de l'année 2026 !</h2>
+            
+            <div class="categories">
+                <a href="#verses" class="category-card" data-category="foi">
+                    <h3>Foi</h3>
+                    <p>Versets inspirants sur la foi</p>
+                </a>
+                <a href="#verses" class="category-card" data-category="grace">
+                    <h3>Grâce</h3>
+                    <p>La grâce divine dans le Nouveau Testament</p>
+                </a>
+                <a href="#verses" class="category-card" data-category="prosperite">
+                    <h3>Prospérité</h3>
+                    <p>Versets sur la prospérité et l'abondance</p>
+                </a>
+                <a href="#verses" class="category-card" data-category="succes">
+                    <h3>Succès</h3>
+                    <p>La voie du succès selon la Parole</p>
+                </a>
+            </div>
+
+            <!-- Affichage des versets par catégorie -->
+            <div class="verses-container" id="versesContainer"></div>
+        </div>
+    </section>
+
+    <!-- Section Agent IA -->
+    <section class="ai-agent-section" id="ai-agent">
+        <div class="container">
+            <h2 class="section-title">Votre Verset de l'année 2026</h2>
+            <p class="section-subtitle">Laissez le Saint-Esprit choisir un verset spécialement pour vous</p>
+            
+            <div class="ai-agent-card">
+                <div class="agent-icon">👑</div>
+                <h3>2026 c'est pas dohi, ca sera chic !</h3>
+                <p>
+                    Entrez votre numéro WhatsApp pour recevoir directement votre verset&nbsp;:
+                </p>
+                <div style="margin-bottom:1rem;display:flex;gap:10px;flex-wrap:wrap;">
+                    <!--<input type="email" id="userEmail" class="select-input" placeholder="Votre e-mail" style="width:48%;margin-top:10px;">-->
+                    <input type="tel" id="userWhatsApp" class="select-input" placeholder="Votre WhatsApp (ex: +225...)" style="width:100%;margin-top:10px;">
+                </div>
+
+                <div class="category-selector">
+                    <label for="verseCategory">Choisissez une catégorie&nbsp;:</label>
+                    <select id="verseCategory" class="select-input">
+                        <option value="all">Toutes les catégories</option>
+                        <option value="foi">Foi</option>
+                        <option value="grace">Grâce</option>
+                        <option value="prosperite">Prospérité</option>
+                        <option value="succes">Succès</option>
+                    </select>
+                </div>
+
+                <button class="generate-button" id="generateVerseBtn">
+                    Recevoir Mon Verset sur WhatsApp
+                </button>
+
+                <div class="random-verse-display" id="randomVerseDisplay" style="margin-top: 1.5rem;">
+                    <p class="verse-text" id="verseText"></p>
+                    <p class="verse-reference" id="verseReference"></p>
+                    <div id="verseSendStatus" style="margin-top:0.5rem;font-size:1rem;"></div>
+                </div>
+            </div>
+            </div>
+            <script>
+            // Simulé: "base de données" locale via localStorage
+            function getUserKey(email, whatsapp, category) {
+                let keyBase = '';
+                if (email) keyBase = 'verse_' + encodeURIComponent(email.trim().toLowerCase());
+                else if (whatsapp) keyBase = 'verse_' + encodeURIComponent(whatsapp.trim());
+                else keyBase = 'verse_unknown';
+                return keyBase + '_' + (category || 'all');
+            }
+
+            function saveAssignedVerse(email, whatsapp, category, verse) {
+                const key = getUserKey(email, whatsapp, category);
+                localStorage.setItem(key, JSON.stringify(verse));
+            }
+
+            function getAssignedVerse(email, whatsapp, category) {
+                const key = getUserKey(email, whatsapp, category);
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            }
+
+            async function sendVerseToServer(contactType, contactValue, verse, callback) {
+                /**
+                 * Cette fonction SUPPOSE qu'un backend existe pour envoyer l'email/WhatsApp.
+                 * Elle fait un POST sur /api/send-verse avec les {type, value, verse}.
+                 * Pour WhatsApp réel, il faut une API tierce côté serveur.
+                 * Pour email, il faut un serveur email côté back.
+                 */
+                try {
+                    const res = await fetch('/api/send-verse', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            contactType: contactType,
+                            contactValue: contactValue,
+                            verse: verse
+                        })
+                    });
+                    if (res.ok) {
+                        callback(true);
+                    } else {
+                        callback(false);
+                    }
+                } catch(e) {
+                    callback(false);
+                }
+            }
+
+            // Nouvelle logique bouton
+            document.getElementById("generateVerseBtn").onclick = function() {
+                const emailInput = document.getElementById('userEmail');
+                const whatsappInput = document.getElementById('userWhatsApp');
+                const email = emailInput.value.trim();
+                const whatsapp = whatsappInput.value.trim();
+                const category = document.getElementById('verseCategory').value;
+
+                const verseStatus = document.getElementById('verseSendStatus');
+                verseStatus.textContent = "";
+
+                // Validation contact
+                if (!email && !whatsapp) {
+                    alert("Veuillez entrer votre email ou votre numéro WhatsApp.");
+                    emailInput.focus();
+                    return;
+                }
+                let isEmailValid = false, isWhatsAppValid = false;
+                if (email) {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    isEmailValid = emailPattern.test(email);
+                    if (!isEmailValid) {
+                        alert("Veuillez entrer un email valide.");
+                        emailInput.focus();
+                        return;
+                    }
+                }
+                // Vérifie WhatsApp: commence par + et >10 chiffres (très basique)
+                if (whatsapp) {
+                    const wpPattern = /^\+\d{8,15}$/;
+                    isWhatsAppValid = wpPattern.test(whatsapp);
+                    if (!isWhatsAppValid) {
+                        alert("Veuillez entrer un numéro WhatsApp valide au format international (+225...).");
+                        whatsappInput.focus();
+                        return;
+                    }
+                }
+
+                let verse = getAssignedVerse(email, whatsapp, category);
+
+                // Sélection source
+                let versePool = [];
+                if (window.VERSES) {
+                    if (category === "all") {
+                        Object.values(window.VERSES).forEach(arr => versePool = versePool.concat(arr));
+                    } else if (window.VERSES[category]) {
+                        versePool = window.VERSES[category];
+                    }
+                }
+
+                if (!verse) {
+                    // Sélectionne un verset aléatoire
+                    if (versePool.length > 0) {
+                        verse = versePool[Math.floor(Math.random() * versePool.length)];
+                    } else {
+                        verse = { text: "Aucun verset disponible.", reference: "" };
+                    }
+                    saveAssignedVerse(email, whatsapp, category, verse);
+                }
+
+                // Affiche dans la page
+                document.getElementById("verseText").textContent = verse.text || "";
+                document.getElementById("verseReference").textContent = verse.reference || "";
+
+                // Envoi verset par le canal choisi
+                let contactType = "";
+                let contactValue = "";
+                if (isEmailValid) {
+                    contactType = 'email';
+                    contactValue = email;
+                } else if (isWhatsAppValid) {
+                    contactType = 'whatsapp';
+                    contactValue = whatsapp;
+                }
+
+                if (contactType) {
+                    verseStatus.textContent = "Envoi en cours...";
+                    sendVerseToServer(contactType, contactValue, verse, function(success) {
+                        if (success) {
+                            if (contactType === "email") {
+                                verseStatus.textContent = "Votre verset a été envoyé par email!";
+                            } else {
+                                verseStatus.textContent = "Votre verset a été envoyé sur WhatsApp!";
+                            }
+                        } else {
+                            verseStatus.textContent = "Erreur lors de l'envoi. Veuillez réessayer.";
+                        }
+                    });
+                } else {
+                    verseStatus.textContent = "Impossible d'envoyer le verset : coordonnées non valides.";
+                }
+            }
+            </script>
+            </div>
+            <script>
+            // Simulé: "base de données" locale via localStorage
+            function getUserKey(email, category) {
+                // Categorie facultative si tu en veux par catégorie
+                return 'verse_' + encodeURIComponent(email.trim().toLowerCase()) + '_' + (category || 'all');
+            }
+
+            function saveAssignedVerse(email, category, verse) {
+                const key = getUserKey(email, category);
+                localStorage.setItem(key, JSON.stringify(verse));
+            }
+
+            function getAssignedVerse(email, category) {
+                const key = getUserKey(email, category);
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            }
+
+            document.getElementById("generateVerseBtn").onclick = function() {
+                const emailInput = document.getElementById('userEmail');
+                const email = emailInput.value.trim();
+                const category = document.getElementById('verseCategory').value;
+
+                // Validation email
+                if (!email) {
+                    alert("Veuillez entrer votre adresse e-mail.");
+                    emailInput.focus();
+                    return;
+                }
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    alert("Veuillez entrer un email valide.");
+                    emailInput.focus();
+                    return;
+                }
+
+                let verse = getAssignedVerse(email, category);
+
+                if (!verse) {
+                    // Sélection du tableau source
+                    let versePool = [];
+                    if (window.VERSES) {
+                        if (category === "all") {
+                            Object.values(window.VERSES).forEach(arr => versePool = versePool.concat(arr));
+                        } else if (window.VERSES[category]) {
+                            versePool = window.VERSES[category];
+                        }
+                    }
+
+                    if (!versePool.length) {
+                        alert("Aucun verset trouvé pour cette catégorie.");
+                        return;
+                    }
+
+                    // Attribution d'un verset au hasard mais unique pour cet utilisateur
+                    const idx = Math.floor(Math.random() * versePool.length);
+                    verse = versePool[idx];
+                    saveAssignedVerse(email, category, verse);
+                }
+
+                // Affichage
+                document.getElementById('randomVerseDisplay').classList.add('active');
+                document.getElementById('verseText').textContent = verse.text;
+                document.getElementById('verseReference').textContent = verse.ref || verse.reference || "";
+
+                // Facultatif: désactive le bouton après attribution
+                // document.getElementById('generateVerseBtn').disabled = true;
+            };
+            </script>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Ambassade Internationale de Christ. Tous droits réservés.</p>
+            <p>une église où le Saint-Esprit transforme le monde en Ambassadeur.</p>
+        </div>
+    </footer>
+
+    <script>
+    // Scroll vers les versets
+    function scrollToVerses() {
+        const section = document.getElementById('verses');
+        if (section) {
+            section.scrollIntoView({behavior: 'smooth'});
+        }
+    }
+
+    // Ensemble de versets par catégorie
+    const VERSES = {
+        "foi": [
+            {
+                text: "Or la foi est une ferme assurance des choses qu’on espère, une démonstration de celles qu’on ne voit pas.",
+                ref: "Hébreux 11:1"
+            },
+            {
+                text: "Car nous marchons par la foi et non par la vue.",
+                ref: "2 Corinthiens 5:7"
+            },
+            {
+                text: "Jésus lui dit: Si tu peux!... Tout est possible à celui qui croit.",
+                ref: "Marc 9:23"
+            }
+        ],
+        "grace": [
+            {
+                text: "Ma grâce te suffit, car ma puissance s'accomplit dans la faiblesse.",
+                ref: "2 Corinthiens 12:9"
+            },
+            {
+                text: "Car c’est par la grâce que vous êtes sauvés, par le moyen de la foi.",
+                ref: "Éphésiens 2:8"
+            },
+            {
+                text: "Le Seigneur est plein de grâce et de compassion, lent à la colère et riche en amour.",
+                ref: "Psaume 145:8"
+            }
+        ],
+        "prosperite": [
+            {
+                text: "L’Éternel ordonnera la bénédiction d’être avec toi dans tes greniers et dans toutes tes entreprises.",
+                ref: "Deutéronome 28:8"
+            },
+            {
+                text: "Car je connais les projets que j’ai formés sur vous... projets de paix et non de malheur, afin de vous donner un avenir et de l’espérance.",
+                ref: "Jérémie 29:11"
+            },
+            {
+                text: "Le bon homme laisse un héritage aux enfants de ses enfants.",
+                ref: "Proverbes 13:22"
+            }
+        ],
+        "succes": [
+            {
+                text: "Tout ce qu’il fait lui réussit.",
+                ref: "Psaume 1:3"
+            },
+            {
+                text: "Remets ton sort à l’Éternel, mets en lui ta confiance, et il agira.",
+                ref: "Psaume 37:5"
+            },
+            {
+                text: "Je puis tout par celui qui me fortifie.",
+                ref: "Philippiens 4:13"
+            }
+        ]
+    };
+
+    // Combine tous les versets en un seul tableau pour 'all'
+    function getAllVerses() {
+        let all = [];
+        Object.values(VERSES).forEach(arr => all = all.concat(arr));
+        return all;
+    }
+
+    function generateRandomVerse() {
+        const category = document.getElementById('verseCategory').value;
+        let versesArr;
+        if (category === "all") {
+            versesArr = getAllVerses();
+        } else {
+            versesArr = VERSES[category] || [];
+        }
+        if (versesArr.length === 0) {
+            document.getElementById('verseText').textContent = "Aucun verset trouvé dans cette catégorie.";
+            document.getElementById('verseReference').textContent = "";
+            document.getElementById('randomVerseDisplay').style.display = "block";
+            document.getElementById('randomVerseDisplay').classList.add('active');
+            return;
+        }
+        const idx = Math.floor(Math.random() * versesArr.length);
+        document.getElementById('verseText').textContent = versesArr[idx].text;
+        document.getElementById('verseReference').textContent = versesArr[idx].ref;
+        document.getElementById('randomVerseDisplay').style.display = "block";
+        document.getElementById('randomVerseDisplay').classList.add('active');
+    }
+
+    // Ajout du listener sur le bouton plutôt que le HTML
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('generateVerseBtn');
+        if (btn) btn.addEventListener('click', generateRandomVerse);
+    });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

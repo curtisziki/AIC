@@ -1,0 +1,662 @@
+/**
+ * NOTE : Ceci est un fichier CSS. Il n'est pas possible d'implémenter la logique de gestion d'attribution d'un verset unique à un utilisateur directement en CSS.
+ * 
+ * Pour répondre à la demande fonctionnelle suivante :
+ * - Identifier la personne (compte utilisateur, email, ou code unique)
+ * - Associer un unique verset à chaque personne (stocké en base de données)
+ * - Lors d'un nouveau clic sur le bouton, retourner le même verset si déjà attribué
+ * 
+ * Cela doit être implémenté côté JavaScript (pour la logique front) et backend (Base de données + API).
+ * 
+ * Le CSS ci-dessous n'est concerné que par l'affichage/stylisation.
+ * 
+ * Voir ci-dessous : styles uniquement, pas de logique applicative.
+ */
+
+/* Luminosité restaurée (filtre supprimé) et couleurs adoucies */
+
+html {
+    /* filter: brightness(0.5) !important;  -- suppression du filtre pour augmenter la luminosité */
+}
+
+/* Palette plus douce et moins éclatante */
+:root {
+    --primary-color: #9352b6;    /* violet doux */
+    --primary-dark: #694278;     /* violet foncé adouci */
+    --primary-light: #dfc0e3;    /* violet pastel pâle */
+    --secondary-color: #23242a;  /* gris foncé neutre */
+    --background: #faf8fb;       /* blanc-violet léger */
+    --surface: #ebe7f2;          /* surface lilas très doux */
+    --text-primary: #24242b;     /* quasi-noir adouci */
+    --text-secondary: #69538b;   /* violet-gris, moins saturé */
+    --card-background: #f8f6fa;  /* blanc violacé pâle */
+    --hero-overlay-bg: rgba(147, 82, 182, 0.41); /* overlay violin adouci et plus translucide */
+}
+
+[data-theme="dark"] {
+    --primary-color: #be78ce;    /* violet doux mais non flashy */
+    --primary-dark: #965aa7;
+    --primary-light: #e0caea;
+    --secondary-color: #171720;
+    --background: #22202b;
+    --surface: #39344a;
+    --text-primary: #eeeefd;
+    --text-secondary: #b28bb9;
+    --card-background: #292741;
+    --hero-overlay-bg: rgba(190, 120, 206, 0.38);
+}
+
+/**
+ * NOTE : Cette feuille de style ne permet pas d'envoyer des versets par email ou WhatsApp.
+ * 
+ * Pour implémenter la fonctionnalité suivante :
+ * - Après avoir cliqué sur le bouton "Obtenir mon verset", l'utilisateur doit recevoir son verset directement par email ou sur WhatsApp.
+ * 
+ * La logique technique, la collecte de l'email ou du numéro WhatsApp, l'envoi du verset par API ou serveur d'emails/WhatsApp doivent être implémentés côté JavaScript et backend.
+ * 
+ * CSS ci-dessous ne gère que la présentation des éléments du formulaire de contact requis pour recueillir l'information (email ou WhatsApp) avant l'envoi.
+ */
+
+/* Reset et styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.navbar {
+    background-color: var(--secondary-color);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(120, 110, 140, 0.12), 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Nom du site doux */
+.nav-brand-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.nav-brand h1 {
+    color: var(--primary-light);
+    font-size: 2.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 
+        0 2px 8px var(--primary-color), 
+        0 0 2px #edeaf6,
+        0 1px 0 #fff;
+    filter: none;
+    background: linear-gradient(90deg, var(--primary-light), var(--primary-color) 60%, #edeaf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-brand-link:hover .nav-brand h1 {
+    color: var(--primary-color);
+    filter: none;
+    text-shadow: 
+        0 4px 14px var(--primary-color),
+        0 0 2px #edeaf6,
+        0 1px 0 #fff;
+    /* sans effet néon flash */
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light), #edeaf6 110%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.theme-toggle {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1.3rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.7rem;
+    transition: background 0.3s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 2px 7px var(--primary-color), 0 1px 2px #8881;
+}
+
+.theme-toggle:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    transform: scale(1.07);
+    box-shadow: 0 4px 13px var(--primary-light), 0 1px 4px #edeaf6;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0;
+    animation: slideShow 15s infinite;
+    filter: contrast(1.01) saturate(1.05) brightness(1.03);
+}
+
+.slide-1 {
+    background-image: url('images/66.jpg');
+    animation-delay: 0s;
+}
+
+.slide-2 {
+    background-image: url('images/77.jpg');
+    animation-delay: 5s;
+}
+
+.slide-3 {
+    background-image: url('images/99.jpg');
+    animation-delay: 10s;
+}
+
+@keyframes slideShow {
+    0% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    10% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 1;
+    }
+    40% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--hero-overlay-bg);
+    z-index: 1;
+    mix-blend-mode: lighten;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    padding: 2rem;
+}
+
+.hero-title {
+    font-size: 3.4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px var(--primary-color), 0 2px 6px #edeaf6, 0 1px 0 #fff;
+    letter-spacing: 2.5px;
+    background: linear-gradient(90deg, var(--primary-light), #edeaf6 70%, var(--primary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: none;
+}
+
+.hero-subtitle {
+    font-size: 1.7rem;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    text-shadow: 0 1px 4px var(--primary-light), 0 0 1px #edeaf6;
+}
+
+/* Boutons moins flashy */
+.cta-button {
+    background: linear-gradient(90deg, var(--primary-color) 70%, var(--primary-light));
+    color: white;
+    border: none;
+    padding: 1rem 2.4rem;
+    font-size: 1.3rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.2s, transform 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    box-shadow: 0 1px 7px var(--primary-light), 0 1px 2px #e6e3f77a;
+}
+
+.cta-button:hover {
+    background: linear-gradient(90deg, var(--primary-light) 60%, var(--primary-color), #edeaf6 120%);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 4px 12px var(--primary-color), 0 2px 7px rgba(190,120,206,0.25);
+}
+
+/* Sections */
+.verses-section, .ai-agent-section {
+    padding: 4rem 0;
+    background-color: var(--surface);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    text-shadow: 0 1px 6px var(--primary-light), 0 1px 0 #edeaf6;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    text-shadow: 0 1px 2px var(--primary-light);
+}
+
+/* Catégories */
+.categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.category-card {
+    background: var(--card-background);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.2s;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 4px 14px var(--primary-light), 0 2px 5px #edeaf63f;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.category-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    border-color: var(--primary-light);
+    box-shadow: 0 10px 24px var(--primary-color), 0 4px 12px #d2b3e153;
+}
+
+.category-card:visited {
+    color: inherit;
+}
+
+.category-card:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+}
+
+.category-card h3 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 0.7rem;
+    font-weight: bold;
+    filter: none;
+}
+
+.category-card p {
+    color: var(--text-secondary);
+    font-size: 1.08rem;
+    text-shadow: 0 1px 1px #edeaf6;
+}
+
+/* Versets Container */
+.verses-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    min-height: 100px;
+}
+
+.verse-card {
+    background: var(--card-background);
+    padding: 2rem;
+    border-radius: 15px;
+    border-left: 7px solid var(--primary-color);
+    box-shadow: 0 3px 11px var(--primary-light), 0 1px 4px #edeaf62f;
+    transition: transform 0.3s;
+}
+
+.verse-card:hover {
+    transform: translateX(8px) scale(1.02);
+    border-left-color: var(--primary-light);
+    box-shadow: 0 7px 15px var(--primary-color), 0 4px 12px #be78ce23;
+}
+
+.verse-card .verse-text {
+    font-size: 1.22rem;
+    font-style: italic;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+.verse-card .verse-reference {
+    font-size: 1.03rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    text-align: right;
+}
+
+/* Agent IA Section */
+.ai-agent-card {
+    background: var(--card-background);
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 6px 21px var(--primary-light), 0 4px 14px #17172033;
+    border: 2.5px solid var(--primary-color);
+    /* Pour permettre l'affichage dynamique des versets */
+    min-height: 280px;
+}
+
+/* Champs pour récupérer l'email ou WhatsApp */
+.contact-choice-group {
+    margin: 1.5rem 0 2rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.contact-choice {
+    display: flex;
+    align-items: center;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+}
+.contact-choice input[type="radio"] {
+    margin-right: 0.5rem;
+}
+
+.contact-input-field {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.75rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    background: var(--background);
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    box-sizing: border-box;
+}
+
+.agent-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.ai-agent-card h3 {
+    color: var(--primary-color);
+    font-size: 2.1rem;
+    margin-bottom: 1.1rem;
+    text-shadow: 0 1px 4px var(--primary-light), 0 0px 1px #edeaf6;
+}
+
+.ai-agent-card > p {
+    color: var(--text-secondary);
+    font-size: 1.12rem;
+    margin-bottom: 2rem;
+    text-shadow: 0 1px 2px var(--primary-light);
+}
+
+.category-selector {
+    margin: 2rem 0;
+}
+
+.category-selector label {
+    display: block;
+    color: var(--text-primary);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.select-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.75rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    background: var(--background);
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Button booster & anim - plus doux */
+.generate-button {
+    background: linear-gradient(90deg, var(--primary-color) 70%, var(--primary-light));
+    color: #fff;
+    border: none;
+    padding: 1rem 3.2rem;
+    font-size: 1.32rem;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.3s, box-shadow 0.2s, transform 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: bold;
+    box-shadow: 0 2px 9px var(--primary-light), 0 1px 2px #edeaf6a2;
+}
+
+.generate-button:hover:not(:disabled) {
+    background: linear-gradient(90deg, var(--primary-light) 75%, var(--primary-color));
+    transform: scale(1.03);
+    box-shadow: 0 4px 16px var(--primary-color), 0 4px 16px #b9aad4a3;
+}
+
+.generate-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+}
+
+/* affichage dynamique des versets dans l'agent IA */
+.ai-agent-card .verse-container {
+    margin-top: 2rem;
+    padding: 1.5rem 2rem;
+    background: var(--surface);
+    border-radius: 15px;
+    min-height: 140px;
+    display: none;
+    box-shadow: 0 1px 7px var(--primary-color), 0 1px 5px rgba(147,82,182,0.04);
+}
+
+.ai-agent-card .verse-container.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.ai-agent-card .verse-text {
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    animation: slideInText 0.8s ease;
+    text-shadow: 0 1px 4px var(--primary-light);
+}
+
+.ai-agent-card .verse-reference {
+    font-size: 1.14rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    animation: slideInText 0.8s ease 0.2s both;
+    text-shadow: 0 1px 4px var(--primary-light);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes slideInText {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.random-verse-display {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 15px;
+    min-height: 150px;
+    display: none;
+    box-shadow: 0 1px 8px var(--primary-color), 0 1px 6px #edeaf6;
+}
+
+.random-verse-display.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.random-verse-display .verse-text {
+    font-size: 1.55rem;
+    font-style: italic;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+    animation: slideInText 0.8s ease;
+    text-shadow: 0 1px 7px var(--primary-light);
+}
+
+.random-verse-display .verse-reference {
+    font-size: 1.26rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    animation: slideInText 0.8s ease 0.2s both;
+    text-shadow: 0 1px 4px var(--primary-light);
+}
+
+/* Footer */
+.footer {
+    background: var(--secondary-color);
+    color: white;
+    padding: 2rem 0;
+    text-align: center;
+    box-shadow: 0 1px 9px var(--primary-color), 0 1px 6px #edeaf6;
+}
+
+.footer p {
+    margin: 0.5rem 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-brand h1 {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 3px var(--primary-color), 0 0 1px #edeaf6;
+    }
+
+    .hero-title {
+        font-size: 2.1rem;
+        letter-spacing: 1px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.19rem;
+        text-shadow: 0 1px 2px var(--primary-light);
+    }
+
+    .section-title {
+        font-size: 2.1rem;
+    }
+
+    .categories {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-agent-card {
+        padding: 2rem;
+    }
+    .ai-agent-card .verse-container,
+    .random-verse-display {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    .contact-choice-group {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .contact-input-field {
+        max-width: 90vw;
+    }
+}
